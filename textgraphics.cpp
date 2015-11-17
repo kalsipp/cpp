@@ -117,14 +117,19 @@ bool Textgrafs::next_tick(){
 }
 void Textgrafs::add_row(std::string text, int px, int py){
   int len = 0;
-  if(py < 0 || py > cols_){
+  if(py < 0 || py >= cols_){
     return;
   }
   if(px < 0){
-    text.erase(0,abs(px));
+    if(abs(px) < text.length()){
+      text.erase(0,abs(px));
+    }
   }
-  if(px > rows_){
-    text.erase(text.length()-(px-rows_), text.length());
+  if(px >=rows_){
+    return;
+  }
+  if(px + text.length() >= rows_){
+    text.erase((px-rows_), text.length());
   }
   grid[py].replace(px, text.length(), text);
 }
