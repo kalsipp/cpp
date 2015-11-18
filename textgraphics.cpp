@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <ios>
+#include <fstream>
+#include <stdio.h>
 class Textgrafs{
 public:
   Textgrafs();
@@ -41,17 +44,23 @@ void Textgrafs::fun(){
 }
 
 Textgrafs::Textgrafs(){
+  std::cout << std::unitbuf; //Turns off the buffer
+  std::ios_base::sync_with_stdio(false); //Turn off sync with in stream
+
+  //Get size of window
   struct winsize w;
   ioctl(0, TIOCGWINSZ, &w);
   rows_ = w.ws_row;
   cols_ = w.ws_col;
+  //Prepare grid
   std::string s(cols_, ' ');
   grid.resize(rows_,s);
   old_grid.resize(rows_,s);
+  //settings
   framerate_ = 100000;
-  time_between_frames_ = 0.001;//0.010;
-  timer_ = std::chrono::system_clock::now();
-  clear();
+  time_between_frames_ = 0.050;//0.010;
+  timer_ = std::chrono::system_clock::now(); //First timepoint
+  clear(); //and clear screen
   //  grid = new char*[cols_]; 
   // for(int i = 0; i < cols_; ++i){
   // grid[i] = new char[rows_];
@@ -93,12 +102,23 @@ void Textgrafs::save_old_grid(){
 void Textgrafs::print(){
   //std::string s;
     //clear();
-    for(int i = 0; i < rows_ ; ++i){
-      cursorpos(0, i); 
-      if(0 != grid[i].compare(old_grid[i])){
-	std::cout << grid[i];
+    //for(int i = 0; i < rows_ ; ++i){
+      //cursorpos(0, i); 
+      //if(0 != grid[i].compare(old_grid[i])){
+	//std::cout << grid[i];
+	//}
+      //}
+    std::string s;
+    cursorpos(0,0);
+    for(int y = 0; y < rows_ ; ++y){
+      for(int x = 0; x < cols_ ; ++x){
+	  s+= grid[y][x];
       }
-  }
+      s+= "\n";
+    }
+    s.pop_back();
+    std::cout << s;
+    //printf(s.c_str());
 }
 void Textgrafs::clear_grid(){
   std::string s(cols_, ' ');
@@ -133,7 +153,8 @@ void Textgrafs::add_row(std::string text, int px, int py){
   if(px + text.length() >= cols_){
     text.erase((cols_-px), text.length());
   }
-  grid[py].replace(px, text.length(), text);
+  if(px >= 0)  grid[py].replace(px, text.length(), text);
+  if(px < 0) grid[py].replace(0, text.length(), text);
 }
 void Textgrafs::add_col(std::string text, int px, int py){
   if(px < 0 || px >= cols_ || py >= rows_){
@@ -213,10 +234,10 @@ int main(){
   //borderx.copy(k,1, 6);
   while(1){
     // p.add_row(k, 10, 10);
-    //p.add_row(borderx, 0, 0);
-    //p.add_row(borderx, 0, p.rows_-1);
-    //p.add_col(bordery, 0, 0);
-    //p.add_col(bordery, p.cols_-1, 0);
+    p.add_row(borderx, 0, 0);
+    p.add_row(borderx, 0, p.rows_-1);
+    p.add_col(bordery, 0, 0);
+    p.add_col(bordery, p.cols_-1, 0);
     p.add_rect('e', px, py, sizex, sizey);
     px += speedx;
     py += speedy;
@@ -242,6 +263,6 @@ int main(){
     //if(counter > 100) counter = 0;
     //p.add_row(std::chrono::system_clock::now(), 1, 1);
     p.paint();
-  }
+    }
 }
 
