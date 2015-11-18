@@ -8,38 +8,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <unistd.h>
-class Textgrafs{
-public:
-  Textgrafs();
-  ~Textgrafs();
-  void add_row(std::string, int, int);
-  void add_col(std::string, int, int);
-  void add_rect(char, int, int, int, int);
-  void add_ellipse(char, int, int, int, int);
-  void print();
-  bool next_tick();
-  void paint();
-  void clear();
-  void fun();
-  void hide_cursor();
-  void cursorpos(int, int);
-  void save_old_grid();
-  int rows_;
-  int cols_;
-private:
-  void clear_grid();
-  //int tick_counter_= 0;
-  //int framerate_ = 30000000;
-  std::chrono::system_clock::time_point timer_;
-  //std::chrono::steady_clock reftime_;
-  bool debug = false;
-  float framerate_ = 0;
-  double time_between_frames_ = 0;
-  //char** grid;
-  std::vector<std::string> grid;
-  std::vector<std::string> old_grid;
-};
-
+#include "textgraphics.hpp"
 void Textgrafs::fun(){
   std::cout << "\033[1;1H" <<std::endl;
 }
@@ -204,59 +173,5 @@ void Textgrafs::add_ellipse(char letter, int px,int py, int rx, int ry){
     
     add_row(p, px + starts[i], py + i);
   }
-}
-int main(){
-  Textgrafs p;
-  p.add_row("hehe", 1, 1);
-  //p.add_col("huehue", 20, 20);
-  //  while(1){
-  //p.add_row("hehe", 10, 10);
-
-  //}
-  std::cout << "\033[?25l"; //Hide cursor
-  int counter = 0;
-  float px = 0;
-  float py = 0;
-  int sizex = 10;
-  int sizey = 6;
-  float speedx = 0.001f;
-  float speedy = 0.0008f;
-  std::string borderx(p.cols_, '0');
-  std::string bordery(p.rows_, '0');
-  std::string k;
-  k.assign(borderx, 6, 1);
-  //borderx.copy(k,1, 6);
-  while(1){
-    // p.add_row(k, 10, 10);
-    p.add_row(borderx, 0, 0);
-    p.add_row(borderx, 0, p.rows_-1);
-    p.add_col(bordery, 0, 0);
-    p.add_col(bordery, p.cols_-1, 0);
-    p.add_rect('e', px, py, sizex, sizey);
-    px += speedx;
-    py += speedy;
-    if(px + sizex -1 > p.cols_){
-      px = p.cols_-sizex-1;
-      speedx = speedx*-1;
-    }
-    else if(px < 0){
-      px = 0;
-      speedx = speedx*-1;
-    }
-    if(py + sizey -1> p.rows_){
-      py = p.rows_ - sizey-1;
-      speedy = speedy*-1;
-    }
-    else if(py < 1){
-      py = 1;
-      speedy = speedy*-1;
-    }
-    //p.add_row("hej", 1, counter);
-    //counter++;
-    //p.add_ellipse('e', 10, 10, 7, 7);
-    //if(counter > 100) counter = 0;
-    //p.add_row(std::chrono::system_clock::now(), 1, 1);
-    p.paint();
-    }
 }
 
