@@ -7,6 +7,7 @@
 #include <ios>
 #include <fstream>
 #include <stdio.h>
+#include <unistd.h>
 class Textgrafs{
 public:
   Textgrafs();
@@ -100,25 +101,18 @@ void Textgrafs::save_old_grid(){
   }
 }
 void Textgrafs::print(){
-  //std::string s;
-    //clear();
-    //for(int i = 0; i < rows_ ; ++i){
-      //cursorpos(0, i); 
-      //if(0 != grid[i].compare(old_grid[i])){
-	//std::cout << grid[i];
-	//}
-      //}
     std::string s;
-    cursorpos(0,0);
+    //cursorpos(0,0);
+    s+= "\033[1;1H";
     for(int y = 0; y < rows_ ; ++y){
-      for(int x = 0; x < cols_ ; ++x){
-	  s+= grid[y][x];
-      }
+      s+= grid[y];
       s+= "\n";
     }
     s.pop_back();
-    std::cout << s;
-    //printf(s.c_str());
+    //puts(s.c_str());
+    write(1, s.c_str(), s.length());
+    //std::cout << s;
+    
 }
 void Textgrafs::clear_grid(){
   std::string s(cols_, ' ');
@@ -225,8 +219,8 @@ int main(){
   float py = 0;
   int sizex = 10;
   int sizey = 6;
-  float speedx = 0.0005f;
-  float speedy = 0.0004f;
+  float speedx = 0.001f;
+  float speedy = 0.0008f;
   std::string borderx(p.cols_, '0');
   std::string bordery(p.rows_, '0');
   std::string k;
