@@ -9,49 +9,43 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "textgraphics.hpp"
-void Textgrafs::fun(){
-  std::cout << "\033[1;1H" <<std::endl;
-}
 
-Textgrafs::Textgrafs(){
+//#### Special member functions ####
+//#### Constructor
+Textgrafs::Textgrafs(){ 
   std::cout << std::unitbuf; //Turns off the buffer
   std::ios_base::sync_with_stdio(false); //Turn off sync with in stream
 
-  //Get size of window
-  struct winsize w;
+  struct winsize w; //Get size of window
   ioctl(0, TIOCGWINSZ, &w);
   rows_ = w.ws_row;
   cols_ = w.ws_col;
+
   //Prepare grid
   std::string s(cols_, ' ');
   grid.resize(rows_,s);
   old_grid.resize(rows_,s);
-  //settings
-  framerate_ = 100000;
-  time_between_frames_ = 0.050;//0.010;
+
   timer_ = std::chrono::system_clock::now(); //First timepoint
   clear(); //and clear screen
-  //  grid = new char*[cols_]; 
-  // for(int i = 0; i < cols_; ++i){
-  // grid[i] = new char[rows_];
-  //  }
 }
+//#### Destructor
 Textgrafs::~Textgrafs(){
-  
-  //for(int i = 0; i < rows_; ++i){
-  //delete[] grid[i];
-  //}
-  //delete[] grid;
+  //Actually don't need one right now
 }
 
+//#### Member functions
 void Textgrafs::paint(){
-  //add_row(std::to_string(timer_), 1, 1);
-  if(next_tick()){
-    print();
-    save_old_grid();
+  //Used for continuous update
+  //Refer to print for manual control
+  if(next_tick()){ //Limit framerate
+    print(); //Print out the current grid
+    //save_old_grid();
   }
-  clear_grid();
+  clear_grid(); //This empties the grid. You need to enter what you need to paint every frame
 }
+
+
 void Textgrafs::cursorpos(int px, int py){
   ++px; //escape is 1 base
   ++py;
@@ -71,25 +65,26 @@ void Textgrafs::save_old_grid(){
 }
 void Textgrafs::print(){
     std::string s;
-    //cursorpos(0,0);
-    s+= "\033[1;1H";
-    for(int y = 0; y < rows_ ; ++y){
+    s+= "\033[1;1H"; //set cursor to 0,0
+    for(int y = 0; y < rows_ ; ++y){ //Generate the full grid
       s+= grid[y];
       s+= "\n";
     }
-    s.pop_back();
-    //puts(s.c_str());
-    write(1, s.c_str(), s.length());
-    //std::cout << s;
+    s.pop_back(); //Remove last \n
+    write(1, s.c_str(), s.length()); //works 
+    //std::cout << s; //works
+    //printf(s.c_str()); //bad
     
 }
 void Textgrafs::clear_grid(){
+  //Fills the grid with space
   std::string s(cols_, ' ');
   for(int i = 0; i < rows_ ; ++i){
     grid[i] = s;
   }
 }
 bool Textgrafs::next_tick(){
+  //Calculate next frame
   std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::system_clock::now()-timer_);
   if(debug)add_row(std::to_string(time_span.count()), 0, 0);
 //std::cout<< time_span.count();
@@ -101,7 +96,8 @@ bool Textgrafs::next_tick(){
   
 }
 void Textgrafs::add_row(std::string text, int px, int py){
-  
+  //User adds a row of text to the grid. 
+  //if outside the screen the text will be truncated (or ignored if nothing is on screen)
   if(py < 0 || py >= rows_){
     return;
   }
@@ -120,6 +116,8 @@ void Textgrafs::add_row(std::string text, int px, int py){
   if(px < 0) grid[py].replace(0, text.length(), text);
 }
 void Textgrafs::add_col(std::string text, int px, int py){
+  //User adds a row of text to the grid. 
+  //if outside the screen the text will be truncated (or ignored if nothing is on screen)
   if(px < 0 || px >= cols_ || py >= rows_){
     return;
   }
@@ -135,17 +133,52 @@ void Textgrafs::add_col(std::string text, int px, int py){
   for(int i = 0;  i < text.length(); ++i){
     s.assign(text, i, 1);
     grid[i].replace(px, 1, s);
-    //TODO fix char * to char error
-    //grid[i].replace(px, 1, text[i]);
   }
 }
 void Textgrafs::add_rect(char letter, int px, int py, int sizex, int sizey){
+  //User adds a full rext to the grid. 
+  //if outside the screen the text will be truncated (or ignored if nothing is on screen)
   std::string s(sizex, letter);
   for(int i = 0; i < sizey; ++i){
-    add_row(s, px, py+i);
+    add_row(s, px, py+i); //Truncation will be handled by add_row
   }
 }
 
+void Textgrafs::add_rect_unique(std::vector<std::string> shape, int px, int py){
+  for(int i = 0; i<shape.size();++i){
+    add_row(shape[i], px, py+i);
+  }
+}
+
+void Textgrafs::add_border(char letter, int px, int py, int sizex, int sizey, int thickness){
+  if(thickness == 0)return;
+  std::string obx(sizex, letter); //outer border x
+  std::string oby(sizey, letter); //outer border y
+  if(thickness > 0){
+
+    //Create outer borders
+    add_row(obx, px, py);
+    add_row(obx, px, py+sizey);
+    add_col(oby, px, py);
+    add_col(oby, px+sizex, py);
+    //Create inner borders
+    //Setup distances
+    int dx = sizex-2*thickness;
+    if(dx < 0) dx = 1; //Come on use add_rect then
+    std::string ibx(dx, letter);
+    int dy = sizey-2*thickness;
+    if(dy < 0 ) dy = 1;
+    std::string iby(dy, letter);
+    //add borders with modified values
+    add_row(ibx, px+thickness, py+thickness);
+    add_row(ibx, px+thickness, py+sizey-thickness);
+    add_col(iby, px+thickness, py+thickness);
+    add_col(iby, px+sizex-thickness, py+thickness);
+  }
+  else if(thickness < 0){
+      
+    } 
+}
 void Textgrafs::add_ellipse(char letter, int px,int py, int rx, int ry){
   //x^2/a^2 + y^2/b^2 = 1
   //TODO make work

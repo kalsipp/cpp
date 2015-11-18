@@ -9,30 +9,27 @@ class Textgrafs{
 public:
   Textgrafs();
   ~Textgrafs();
-  void add_row(std::string, int, int);
-  void add_col(std::string, int, int);
-  void add_rect(char, int, int, int, int);
-  void add_ellipse(char, int, int, int, int);
-  void print();
-  bool next_tick();
-  void paint();
-  void clear();
-  void fun();
+  void add_row(std::string text, int px, int py); //Add row of text. Show with print or paint
+  void add_col(std::string text, int px , int py);
+  void add_rect(char letter, int px, int py, int sizex, int sizey);
+  void add_border(char letter, int px, int py, int sizex, int sizey, int thickness);
+  void add_rect_unique(std::vector<std::string> shape, int px, int py);
+  void add_ellipse(char letter, int px, int py, int rx, int ry); //Broken
+  void print(); //Prints one grid
+  bool next_tick(); //Should be private
+  void paint(); //For continuous animation
+  void clear(); //Empty screen
   void hide_cursor();
-  void cursorpos(int, int);
-  void save_old_grid();
+  void cursorpos(int, int); //Set cursorpos on screen
+ 
   int rows_;
   int cols_;
 private:
   void clear_grid();
-  //int tick_counter_= 0;
-  //int framerate_ = 30000000;
+  void save_old_grid();
   std::chrono::system_clock::time_point timer_;
-  //std::chrono::steady_clock reftime_;
   bool debug = false;
-  float framerate_ = 0;
-  double time_between_frames_ = 0;
-  //char** grid;
+  double time_between_frames_ = 0.005;
   std::vector<std::string> grid;
   std::vector<std::string> old_grid;
 };
