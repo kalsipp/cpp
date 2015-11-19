@@ -42,7 +42,7 @@ void Textgrafs::paint(){
     print(); //Print out the current grid
     //save_old_grid();
   }
-  clear_grid(); //This empties the grid. You need to enter what you need to paint every frame
+  clear_grid(); //This empties the grid. You need to enter what you painted every frame
 }
 
 
@@ -65,7 +65,8 @@ void Textgrafs::save_old_grid(){
 }
 void Textgrafs::print(){
     std::string s;
-    s+= "\033[1;1H"; //set cursor to 0,0
+    //s+= "\033[1;1H"; //set cursor to 0,0
+    cursorpos(0,0);
     for(int y = 0; y < rows_ ; ++y){ //Generate the full grid
       s+= grid[y];
       s+= "\n";
@@ -87,7 +88,6 @@ bool Textgrafs::next_tick(){
   //Calculate next frame
   std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::system_clock::now()-timer_);
   if(debug)add_row(std::to_string(time_span.count()), 0, 0);
-//std::cout<< time_span.count();
   if(time_span.count() > time_between_frames_){
     timer_ = std::chrono::system_clock::now();
     return true;
@@ -130,9 +130,10 @@ void Textgrafs::add_col(std::string text, int px, int py){
     text.erase((rows_-py), text.length());
   }
   std::string s;
-  for(int i = 0;  i < text.length(); ++i){
-    s.assign(text, i, 1);
-    grid[i].replace(px, 1, s);
+  for(int i = py;  i < py+text.length(); ++i){
+    std::cout << "i " << i << std::endl;
+    s.assign(text, i-py, 1);
+    add_row(s, px, i);
   }
 }
 void Textgrafs::add_rect(char letter, int px, int py, int sizex, int sizey){
@@ -152,7 +153,7 @@ void Textgrafs::add_rect_unique(std::vector<std::string> shape, int px, int py){
 
 void Textgrafs::add_border(char letter, int px, int py, int sizex, int sizey, int thickness){
   if(thickness == 0)return;
-  std::string obx(sizex, letter); //outer border x
+  std::string obx(sizex+1, letter); //outer border x
   std::string oby(sizey, letter); //outer border y
   if(thickness > 0){
 
@@ -165,15 +166,15 @@ void Textgrafs::add_border(char letter, int px, int py, int sizex, int sizey, in
     //Setup distances
     int dx = sizex-2*thickness;
     if(dx < 0) dx = 1; //Come on use add_rect then
-    std::string ibx(dx, letter);
+    std::string ibx(dx-1, letter);
     int dy = sizey-2*thickness;
     if(dy < 0 ) dy = 1;
     std::string iby(dy, letter);
     //add borders with modified values
-    add_row(ibx, px+thickness, py+thickness);
-    add_row(ibx, px+thickness, py+sizey-thickness);
-    add_col(iby, px+thickness, py+thickness);
-    add_col(iby, px+sizex-thickness, py+thickness);
+    add_row(ibx, px+thickness+1, py+thickness);
+    add_row(ibx, px+thickness+1, py+sizey-thickness);
+    add_col(iby, px+thickness+1, py+thickness);
+    add_col(iby, px+sizex-thickness-1, py+thickness);
   }
   else if(thickness < 0){
       

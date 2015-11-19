@@ -21,11 +21,11 @@ public:
   void clear(); //Empty screen
   void hide_cursor();
   void cursorpos(int, int); //Set cursorpos on screen
- 
+  void clear_grid(); 
   int rows_;
   int cols_;
 private:
-  void clear_grid();
+
   void save_old_grid();
   std::chrono::system_clock::time_point timer_;
   bool debug = false;
