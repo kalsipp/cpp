@@ -12,7 +12,7 @@ public:
   void add_row(std::string text, int px, int py); //Add row of text. Show with print or paint
   void add_col(std::string text, int px , int py);
   void add_rect(char letter, int px, int py, int sizex, int sizey);
-  void add_border(char letter, int px, int py, int sizex, int sizey, int thickness);
+  void add_border(char letter, int px, int py, int sizex, int sizey);
   void add_rect_unique(std::vector<std::string> shape, int px, int py);
   void add_ellipse(char letter, int px, int py, int rx, int ry); //Broken
   void print(); //Prints one grid
@@ -21,6 +21,7 @@ public:
   void clear(); //Empty screen
   void hide_cursor();
   void cursorpos(int, int); //Set cursorpos on screen
+  std::string cursorpos_str(int, int);
   void clear_grid(); 
   int rows_;
   int cols_;

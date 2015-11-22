@@ -51,6 +51,12 @@ void Textgrafs::cursorpos(int px, int py){
   ++py;
   std::cout << "\033[" << py << ";" << px << "H";
 }
+std::string Textgrafs::cursorpos_str(int px, int py){
+  ++px;
+  ++py;
+  std::string s = "\033[" + std::to_string(px) + ";" + std::to_string(py) + "H";
+  return s;
+}
 void Textgrafs::hide_cursor(){
 }
 void Textgrafs::clear(){
@@ -65,17 +71,19 @@ void Textgrafs::save_old_grid(){
 }
 void Textgrafs::print(){
     std::string s;
-    //s+= "\033[1;1H"; //set cursor to 0,0
+ 
+    
     cursorpos(0,0);
     for(int y = 0; y < rows_ ; ++y){ //Generate the full grid
-      s+= grid[y];
+          s+= grid[y];
       s+= "\n";
     }
     s.pop_back(); //Remove last \n
-    write(1, s.c_str(), s.length()); //works 
-    //std::cout << s; //works
-    //printf(s.c_str()); //bad
+    //write(1, s.c_str(), s.length()); //works 
     
+    std::cout << s;//works
+    
+    //printf(s.c_str()); //bad
 }
 void Textgrafs::clear_grid(){
   //Fills the grid with space
@@ -131,7 +139,7 @@ void Textgrafs::add_col(std::string text, int px, int py){
   }
   std::string s;
   for(int i = py;  i < py+text.length(); ++i){
-    std::cout << "i " << i << std::endl;
+    //std::cout << "i " << i << std::endl;
     s.assign(text, i-py, 1);
     add_row(s, px, i);
   }
@@ -151,34 +159,15 @@ void Textgrafs::add_rect_unique(std::vector<std::string> shape, int px, int py){
   }
 }
 
-void Textgrafs::add_border(char letter, int px, int py, int sizex, int sizey, int thickness){
-  if(thickness == 0)return;
-  std::string obx(sizex+1, letter); //outer border x
+void Textgrafs::add_border(char letter, int px, int py, int sizex, int sizey){
+  std::string obx(sizex-1, letter); //outer border x
   std::string oby(sizey, letter); //outer border y
-  if(thickness > 0){
 
     //Create outer borders
     add_row(obx, px, py);
-    add_row(obx, px, py+sizey);
+    add_row(obx, px, py+sizey-1);
     add_col(oby, px, py);
-    add_col(oby, px+sizex, py);
-    //Create inner borders
-    //Setup distances
-    int dx = sizex-2*thickness;
-    if(dx < 0) dx = 1; //Come on use add_rect then
-    std::string ibx(dx-1, letter);
-    int dy = sizey-2*thickness;
-    if(dy < 0 ) dy = 1;
-    std::string iby(dy, letter);
-    //add borders with modified values
-    add_row(ibx, px+thickness+1, py+thickness);
-    add_row(ibx, px+thickness+1, py+sizey-thickness);
-    add_col(iby, px+thickness+1, py+thickness);
-    add_col(iby, px+sizex-thickness-1, py+thickness);
-  }
-  else if(thickness < 0){
-      
-    } 
+    add_col(oby, px+sizex-1, py);
 }
 void Textgrafs::add_ellipse(char letter, int px,int py, int rx, int ry){
   //x^2/a^2 + y^2/b^2 = 1
