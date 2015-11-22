@@ -14,8 +14,8 @@ int main(){
     p.add_row("Billions upon billions.", 54, p.rows_-2);
     //p.add_col("huehue", 20, 20); 
     //p.add_rect_unique(i.get_img_text(), 0, 0);
-    p.print();
-    p.print_img(i.get_img_text(), 12, 3, 30, 8);
+    //p.print();
+    //p.print_img(i.get_img_text(), 12, 3, 30, 8);
     //i.print_img();
     
     sleep(1); 
