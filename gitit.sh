@@ -5,5 +5,6 @@ git add main.cpp
 git add makefile
 git add run.sh
 git add gitit.sh
-git commit -m "Increasing scale"
+git add imgcontainer.cpp
+git commit -m "Adding image to ascii conversion"
 git push origin master
