@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <chrono>
-
+#include <climits>
 
 class Textgrafs{
 public:
@@ -13,9 +13,10 @@ public:
   void add_col(std::string text, int px , int py);
   void add_rect(char letter, int px, int py, int sizex, int sizey);
   void add_border(char letter, int px, int py, int sizex, int sizey);
-  void add_rect_unique(std::vector<std::string> shape, int px, int py);
+  void add_rect_unique(const std::vector<std::string> & shape , int px, int py);
   void add_ellipse(char letter, int px, int py, int rx, int ry); //Broken
   void print(); //Prints one grid
+  void print_img(std::vector<std::string>&, int px, int py, int max_size_y = INT_MAX, int min_size_y = 0);
   bool next_tick(); //Should be private
   void paint(); //For continuous animation
   void clear(); //Empty screen

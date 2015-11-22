@@ -27,7 +27,7 @@ Textgrafs::Textgrafs(){
   old_grid.resize(rows_,s);
 
   timer_ = std::chrono::system_clock::now(); //First timepoint
-  clear(); //and clear screen
+  
 }
 //#### Destructor
 Textgrafs::~Textgrafs(){
@@ -76,7 +76,7 @@ void Textgrafs::print(){
     cursorpos(0,0);
     for(int y = 0; y < rows_ ; ++y){ //Generate the full grid
           s+= grid[y];
-      s+= "\n";
+	  s+= "\n";
     }
     s.pop_back(); //Remove last \n
     //write(1, s.c_str(), s.length()); //works 
@@ -84,6 +84,29 @@ void Textgrafs::print(){
     std::cout << s;//works
     
     //printf(s.c_str()); //bad
+}
+
+void Textgrafs::print_img(std::vector<std::string> & img_ref, int px, int py, int max_size_y, int min_size_y){
+  //Dealing with scrap input
+  if(img_ref.size() <=0) return; 
+  if(img_ref[0].length() <= 0) return;
+  //If outside screen skip it
+  if(px >= cols_) return;
+  if(py >= rows_) return;
+  if(px + img_ref[0].length() <= 0) return;
+  if(py + img_ref.size() <= 0) return;
+  if(max_size_y <= 0) return;
+  if(min_size_y < 0) return;
+  if(max_size_y <= min_size_y) return;
+ //This function prints out an image, meant to deal with ascii escape code formatted images with color. 
+  //Don't try to do high framerate animations with this.
+  //Cannot truncate overflow in x-axis at the moment due to that every pixel is actually around 11 letters.  
+  for(int i = min_size_y; i < img_ref.size(); ++i){
+    cursorpos(px, py+i-min_size_y);
+    if(i +py-min_size_y>= rows_) break;
+    if(i+py -min_size_y>= max_size_y) break;
+    std::cout << img_ref[i];
+  }
 }
 void Textgrafs::clear_grid(){
   //Fills the grid with space
@@ -153,7 +176,7 @@ void Textgrafs::add_rect(char letter, int px, int py, int sizex, int sizey){
   }
 }
 
-void Textgrafs::add_rect_unique(std::vector<std::string> shape, int px, int py){
+void Textgrafs::add_rect_unique(const std::vector<std::string> & shape, int px, int py){
   for(int i = 0; i<shape.size();++i){
     add_row(shape[i], px, py+i);
   }
