@@ -8,5 +8,5 @@ git add gitit.sh
 git add imgcontainer.cpp
 git add imgcontainer.hpp
 git add img_conv_stolen.py
-git commit -m "Adding image to ascii conversion"
+git commit -m "Forked, reworking into pixelsystem"
 git push origin master
